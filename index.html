@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Foto Telegram Viewer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 5px 0;
+        width: 100%;
+      }
+      img {
+        max-width: 100%;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Telegram Photo Viewer</h2>
+
+    <input type="text" id="botToken" placeholder="Masukkan Bot Token" />
+    <input type="text" id="fileId" placeholder="Masukkan File ID" />
+    <button onclick="loadPhoto()">Tampilkan Foto</button>
+
+    <div id="photoContainer"></div>
+
+    <script>
+      async function loadPhoto() {
+        const botToken = document.getElementById("botToken").value.trim();
+        const fileId = document.getElementById("fileId").value.trim();
+        const photoContainer = document.getElementById("photoContainer");
+
+        photoContainer.innerHTML = "Memuat...";
+
+        try {
+          const response = await fetch(
+            `https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`
+          );
+          const data = await response.json();
+
+          if (!data.ok) {
+            throw new Error("Gagal mendapatkan file path: " + data.description);
+          }
+
+          const filePath = data.result.file_path;
+          const fileUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+
+          photoContainer.innerHTML = `<img src="${fileUrl}" alt="Telegram Photo">`;
+        } catch (error) {
+          photoContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+        }
+      }
+    </script>
+  </body>
+</html>
